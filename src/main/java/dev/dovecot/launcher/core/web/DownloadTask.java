@@ -1,14 +1,12 @@
-package dev.dovecot.launcher.core.internet;
+package dev.dovecot.launcher.core.web;
 
 import dev.dovecot.launcher.core.log.LogManager;
 import dev.dovecot.launcher.core.task.IDownloadTask;
 import dev.dovecot.launcher.core.utils.FileUtils;
 
 import java.io.*;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
