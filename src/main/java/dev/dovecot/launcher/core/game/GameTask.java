@@ -7,20 +7,26 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GameTask
 {
     protected final String[] arguments;
+    protected final GameVersion version;
 
-    protected GameTask(final String[] arguments)
+    protected GameTask(final String[] arguments, final GameVersion version)
     {
         this.arguments = arguments;
+        this.version = version;
     }
 
     public Process run() throws IOException
     {
-        return Runtime.getRuntime().exec(this.arguments);
+        final ProcessBuilder builder = new ProcessBuilder();
+        builder.command(this.arguments);
+        builder.directory(version.getGameDir());
+        return builder.start();
     }
 
     public static String[] generateJVMArguments(final GameVersion version)
@@ -55,6 +61,7 @@ public class GameTask
     public static GameTask generateNewTask(final GameVersion version, final String java, final String[] jvmArguments, final AbstractAccount account) throws IOException
     {
         String[] arguments = ArrayUtils.addAll(new String[]{java}, jvmArguments);
+        arguments = ArrayUtils.addAll(arguments, "-Djava.library.path=" + new File(version.getGameDir(), "versions\\" + version.getName() + "\\natives").getAbsolutePath());
         final StringBuilder classpath = new StringBuilder();
         for (final Object o : version.getJson().getJSONArray("libraries"))
         {
@@ -65,7 +72,7 @@ public class GameTask
                     final File file = new File(new File(version.getGameDir(), "libraries"), ((JSONObject) o).getJSONObject("downloads").getJSONObject("artifact").getString("path"));
                     if (file.exists())
                     {
-                        System.out.println(file.getAbsolutePath());
+                        classpath.append(file.getAbsolutePath()).append(File.pathSeparator);
                     }
                 }
                 else
@@ -73,13 +80,43 @@ public class GameTask
                     final String packageName = ((JSONObject) o).getString("name").split(":")[0];
                     final String libraryName = ((JSONObject) o).getString("name").split(":")[1];
                     final String versionName = ((JSONObject) o).getString("name").split(":")[2];
-                    System.out.println(packageName);
-                    System.out.println(libraryName);
-                    System.out.println(versionName);
+                    final File libraryFile = new File(version.getGameDir(), "libraries\\" + packageName.replace(".", "\\") + "\\" + libraryName + "\\" + versionName + "\\" + libraryName + "-" + versionName + ".jar");
+                    if (libraryFile.exists())
+                    {
+                        classpath.append(libraryFile.getAbsolutePath()).append(File.pathSeparator);
+                    }
                 }
             }
         }
+        classpath.append(new File(version.getGameDir(), "versions\\" + version.getName() + "\\" + version.getName() + ".jar").getAbsolutePath());
         arguments = ArrayUtils.addAll(arguments, "-cp", classpath.toString());
-        return new GameTask(arguments);
+        arguments = ArrayUtils.addAll(arguments, version.getJson().getString("mainClass"));
+        if (version.getJson().has("arguments"))
+        {
+            final List<String> gameArguments = new ArrayList<>();
+            for (final Object value : version.getJson().getJSONObject("arguments").getJSONArray("game"))
+            {
+                if (value instanceof String)
+                {
+                    String replacedValue = value.toString();
+                    System.out.println(value);
+                    replacedValue = replacedValue.replace("${auth_player_name}", account.getName());
+                    replacedValue = replacedValue.replace("${version_name}", "Dovecot");
+                    replacedValue = replacedValue.replace("${game_directory}", version.getGameDir().getAbsolutePath());
+                    replacedValue = replacedValue.replace("${assets_root}", new File(version.getGameDir(), "assets").getAbsolutePath());
+                    replacedValue = replacedValue.replace("${assets_index_name}", version.getJson().getJSONObject("assetIndex").getString("id"));
+                    replacedValue = replacedValue.replace("${auth_uuid}", account.getUuid());
+                    replacedValue = replacedValue.replace("${auth_access_token}", account.getAccessToken());
+                    replacedValue = replacedValue.replace("${user_type}", account.getType());
+                    replacedValue = replacedValue.replace("${version_type}", "DovecotMC");
+                    gameArguments.add(replacedValue);
+                }
+            }
+            arguments = ArrayUtils.addAll(arguments, gameArguments.toArray(new String[]{}));
+        }
+        else
+        {
+        }
+        return new GameTask(arguments, version);
     }
 }

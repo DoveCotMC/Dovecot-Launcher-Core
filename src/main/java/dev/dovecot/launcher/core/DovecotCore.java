@@ -8,11 +8,9 @@ import dev.dovecot.launcher.core.log.LogManager;
 import dev.dovecot.launcher.core.log.Logger;
 import dev.dovecot.launcher.core.utils.FileUtils;
 
-import java.awt.*;
 import java.io.File;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 public class DovecotCore
