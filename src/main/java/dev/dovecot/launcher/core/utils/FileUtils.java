@@ -1,7 +1,9 @@
 package dev.dovecot.launcher.core.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 public final class FileUtils
@@ -18,5 +20,13 @@ public final class FileUtils
             file.getParentFile().mkdirs();
         }
         file.createNewFile();
+    }
+
+    public static byte[] readFile(final File file) throws IOException
+    {
+        final InputStream stream = new FileInputStream(file);
+        final byte[] bytes = stream.readAllBytes();
+        stream.close();
+        return bytes;
     }
 }

@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 public class OfflineAccount extends AbstractAccount
 {
-    protected OfflineAccount(final String name)
+    public OfflineAccount(final String name)
     {
         super(name, "\"\"", "\"\"");
     }
