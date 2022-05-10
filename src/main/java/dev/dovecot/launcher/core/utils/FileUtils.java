@@ -1,20 +1,17 @@
 package dev.dovecot.launcher.core.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Objects;
 
 public final class FileUtils
 {
     public static void createFile(final File file) throws IOException
     {
-//        if (file.exists())
-//        {
-//            file.delete();
-////            throw new IOException("Could not delete existed File!");
-//        }
+        if (file.exists())
+        {
+            file.delete();
+//            throw new IOException("Could not delete existed File!");
+        }
         if (!Objects.isNull(file.getParentFile()))
         {
             file.getParentFile().mkdirs();
@@ -28,5 +25,14 @@ public final class FileUtils
         final byte[] bytes = stream.readAllBytes();
         stream.close();
         return bytes;
+    }
+
+    public static void writeFile(final File file, final byte[] content) throws IOException
+    {
+        createFile(file);
+        final OutputStream outputStream = new FileOutputStream(file);
+        outputStream.write(content);
+        outputStream.flush();
+        outputStream.close();
     }
 }

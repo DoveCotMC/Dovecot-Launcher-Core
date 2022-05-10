@@ -10,14 +10,20 @@ public class OfflineAccount extends AbstractAccount
     }
 
     @Override
-    public JSONObject toJson()
+    public String getType()
+    {
+        return "offline";
+    }
+
+    @Override
+    public AbstractAccount fromJson(final JSONObject json)
     {
         return null;
     }
 
     @Override
-    public String getType()
+    public JSONObject toJson()
     {
-        return "offline";
+        return null;
     }
 }

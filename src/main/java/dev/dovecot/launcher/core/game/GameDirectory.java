@@ -15,22 +15,41 @@ public class GameDirectory extends File
 {
     protected final String name;
 
-    public GameDirectory(final String name, final String pathname)
+    public GameDirectory(final String name, final String pathname) throws IOException
     {
         super(pathname);
         this.name = name;
+        this.initialize();
     }
 
-    public GameDirectory(final String name, final File parent, final String child)
+    public GameDirectory(final String name, final File parent, final String child) throws IOException
     {
         super(parent, child);
         this.name = name;
+        this.initialize();
     }
 
-    public GameDirectory(final String name, final URI uri)
+    public GameDirectory(final String name, final URI uri) throws IOException
     {
         super(uri);
         this.name = name;
+        this.initialize();
+    }
+
+    protected void initialize() throws IOException
+    {
+        new File(this, "assets").mkdirs();
+        new File(this, "config").mkdirs();
+        new File(this, "libraries").mkdirs();
+        new File(this, "versions").mkdirs();
+        new File(this, "resourcepacks").mkdirs();
+        new File(this, "saves").mkdirs();
+        new File(this, "screenshots").mkdirs();
+        final File profiles = new File(this, "launcher_profiles.json");
+        if (!profiles.exists())
+        {
+            FileUtils.writeFile(profiles, new JSONObject().toString().getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     public List<GameVersion> loadVersions() throws IOException

@@ -1,6 +1,8 @@
 package dev.dovecot.launcher.core.game;
 
 import dev.dovecot.launcher.core.auth.AbstractAccount;
+import dev.dovecot.launcher.core.auth.AuthlibInjectorAccount;
+import dev.dovecot.launcher.core.utils.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONObject;
 
@@ -61,6 +63,13 @@ public class GameTask
     public static GameTask generateNewTask(final GameVersion version, final String java, final String[] jvmArguments, final AbstractAccount account) throws IOException
     {
         String[] arguments = ArrayUtils.addAll(new String[]{java}, jvmArguments);
+        if (account instanceof AuthlibInjectorAccount)
+        {
+            final File authlibInjectorFile = new File(version.getGameDir(), "authlib-injector.jar");
+            FileUtils.createFile(authlibInjectorFile);
+            FileUtils.writeFile(authlibInjectorFile, GameTask.class.getClassLoader().getResourceAsStream("authlib-injector.jar").readAllBytes());
+            arguments = ArrayUtils.addAll(arguments, String.format("-javaagent:%s=%s", authlibInjectorFile.getAbsoluteFile(), ((AuthlibInjectorAccount) account).getYggdrasilUrl()));
+        }
         arguments = ArrayUtils.addAll(arguments, "-Djava.library.path=" + new File(version.getGameDir(), "versions\\" + version.getName() + "\\natives").getAbsolutePath());
         final StringBuilder classpath = new StringBuilder();
         for (final Object o : version.getJson().getJSONArray("libraries"))
@@ -99,7 +108,6 @@ public class GameTask
                 if (value instanceof String)
                 {
                     String replacedValue = value.toString();
-                    System.out.println(value);
                     replacedValue = replacedValue.replace("${auth_player_name}", account.getName());
                     replacedValue = replacedValue.replace("${version_name}", "Dovecot");
                     replacedValue = replacedValue.replace("${game_directory}", version.getGameDir().getAbsolutePath());

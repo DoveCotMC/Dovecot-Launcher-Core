@@ -1,0 +1,76 @@
+package dev.dovecot.launcher.core.auth;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+
+public class AuthlibInjectorAccount extends AbstractYggdrasilAccount
+{
+    protected final String serverName;
+    protected final String yggdrasilUrl;
+    protected final String serverUrl;
+    protected final String registerUrl;
+
+    protected AuthlibInjectorAccount(final String serverName, final String yggdrasilUrl, final String serverUrl, final String registerUrl, final String name, final String uuid, final String accessToken)
+    {
+        super(name, uuid, accessToken);
+        this.serverName = serverName;
+        this.yggdrasilUrl = yggdrasilUrl;
+        this.serverUrl = serverUrl;
+        this.registerUrl = registerUrl;
+    }
+
+    @Override
+    public AbstractAccount fromJson(final JSONObject json)
+    {
+        return null;
+    }
+
+    @Override
+    public JSONObject toJson()
+    {
+        return null;
+    }
+
+    public String getYggdrasilUrl()
+    {
+        return this.yggdrasilUrl;
+    }
+
+    public static AuthlibInjectorAccount[] authenticate(final String url, final String username, final String password) throws IOException
+    {
+        return authenticate(url, username, password, 10000, 60000);
+    }
+
+    public static AuthlibInjectorAccount[] authenticate(final String yggdrasilUrl, final String username, final String password, final long connectTimeOut, final long readTimeOut) throws IOException
+    {
+        final HttpURLConnection infoConnection = (HttpURLConnection) new URL(yggdrasilUrl).openConnection();
+        infoConnection.setRequestMethod("GET");
+        infoConnection.setDoInput(true);
+        final JSONObject result = new JSONObject(new String(infoConnection.getInputStream().readAllBytes(), StandardCharsets.UTF_8));
+        final String serverName = result.getJSONObject("meta").getString("serverName");
+        final String serverUrl = result.getJSONObject("meta").getJSONObject("links").getString("homepage");
+        final String registerUrl = result.getJSONObject("meta").getJSONObject("links").getString("register");
+//        final String publicKey = result.getString("signaturePublickey").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
+        final HttpURLConnection authConnection = (HttpURLConnection) new URL(yggdrasilUrl + "/authserver/authenticate").openConnection();
+        authConnection.setRequestMethod("POST");
+        authConnection.setRequestProperty("Content-Type", "application/json");
+        authConnection.setDoInput(true);
+        authConnection.setDoOutput(true);
+        authConnection.getOutputStream().write(new JSONObject().put("agent", new JSONObject().put("name", "minecraft").put("version", 1)).put("username", username).put("password", password).toString().getBytes(StandardCharsets.UTF_8));
+        final JSONObject accountJson = new JSONObject(new String(authConnection.getInputStream().readAllBytes(), StandardCharsets.UTF_8));
+        final ArrayList<AuthlibInjectorAccount> accounts = new ArrayList<>();
+        for (final Object profile : accountJson.getJSONArray("availableProfiles"))
+        {
+            if (profile instanceof JSONObject)
+            {
+                accounts.add(new AuthlibInjectorAccount(serverName, yggdrasilUrl, serverUrl, registerUrl, ((JSONObject) profile).getString("name"), ((JSONObject) profile).getString("id"), accountJson.getString("accessToken")));
+            }
+        }
+        return accounts.toArray(new AuthlibInjectorAccount[]{});
+    }
+}

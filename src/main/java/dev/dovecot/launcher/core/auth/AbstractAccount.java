@@ -32,5 +32,7 @@ public abstract class AbstractAccount
 
     public abstract String getType();
 
+    public abstract AbstractAccount fromJson(final JSONObject json);
+
     public abstract JSONObject toJson();
 }
