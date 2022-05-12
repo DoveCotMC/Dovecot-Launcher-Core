@@ -24,16 +24,15 @@ public class AuthlibInjectorAccount extends AbstractYggdrasilAccount
         this.registerUrl = registerUrl;
     }
 
-    @Override
-    public AbstractAccount fromJson(final JSONObject json)
+    public static AbstractAccount fromJson(final JSONObject json)
     {
-        return null;
+        return new AuthlibInjectorAccount(json.getString("server_name"), json.getString("yggdrasil_url"), json.getString("server_url"), json.getString("register_url"), json.getString("username"), json.getString("uuid"), json.getString("access_token"));
     }
 
     @Override
     public JSONObject toJson()
     {
-        return null;
+        return new JSONObject().put("type", "authlib_injector").put("username", this.name).put("uuid", this.uuid).put("server_url", this.serverUrl).put("server_name", this.serverName).put("register_url", this.registerUrl).put("yggdrasil_url", this.yggdrasilUrl).put("access_token", this.accessToken);
     }
 
     public String getYggdrasilUrl()
@@ -56,7 +55,7 @@ public class AuthlibInjectorAccount extends AbstractYggdrasilAccount
         final String serverUrl = result.getJSONObject("meta").getJSONObject("links").getString("homepage");
         final String registerUrl = result.getJSONObject("meta").getJSONObject("links").getString("register");
 //        final String publicKey = result.getString("signaturePublickey").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
-        final HttpURLConnection authConnection = (HttpURLConnection) new URL(yggdrasilUrl + "/authserver/authenticate").openConnection();
+        final HttpURLConnection authConnection = (HttpURLConnection) new URL(yggdrasilUrl.endsWith("/") ? yggdrasilUrl + "authserver/authenticate" : yggdrasilUrl + "/authserver/authenticate").openConnection();
         authConnection.setRequestMethod("POST");
         authConnection.setRequestProperty("Content-Type", "application/json");
         authConnection.setDoInput(true);

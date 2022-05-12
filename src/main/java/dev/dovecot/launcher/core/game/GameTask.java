@@ -66,8 +66,11 @@ public class GameTask
         if (account instanceof AuthlibInjectorAccount)
         {
             final File authlibInjectorFile = new File(version.getGameDir(), "authlib-injector.jar");
-            FileUtils.createFile(authlibInjectorFile);
-            FileUtils.writeFile(authlibInjectorFile, GameTask.class.getClassLoader().getResourceAsStream("authlib-injector.jar").readAllBytes());
+            if (authlibInjectorFile.exists())
+            {
+                FileUtils.createFile(authlibInjectorFile);
+                FileUtils.writeFile(authlibInjectorFile, GameTask.class.getClassLoader().getResourceAsStream("authlib-injector.jar").readAllBytes());
+            }
             arguments = ArrayUtils.addAll(arguments, String.format("-javaagent:%s=%s", authlibInjectorFile.getAbsoluteFile(), ((AuthlibInjectorAccount) account).getYggdrasilUrl()));
         }
         arguments = ArrayUtils.addAll(arguments, "-Djava.library.path=" + new File(version.getGameDir(), "versions\\" + version.getName() + "\\natives").getAbsolutePath());

@@ -9,8 +9,7 @@ public class MojangYggdrasilAccount extends AbstractYggdrasilAccount
         super(name, uuid, accessToken);
     }
 
-    @Override
-    public AbstractAccount fromJson(JSONObject json)
+    public static AbstractAccount fromJson(JSONObject json)
     {
         return null;
     }

@@ -15,8 +15,7 @@ public class OfflineAccount extends AbstractAccount
         return "offline";
     }
 
-    @Override
-    public AbstractAccount fromJson(final JSONObject json)
+    public static AbstractAccount fromJson(final JSONObject json)
     {
         return null;
     }

@@ -18,23 +18,15 @@ import java.util.Date;
 
 public class DovecotCore
 {
-    public static final String SKIN_WEBSITE = "https://124.222.116.158/";
+    public static final String SKIN_WEBSITE = "http://124.222.116.158/";
     public static final String SKIN_WEBSITE_YGGDRASIL = SKIN_WEBSITE + "api/yggdrasil/";
     public static final File SAVE_DIR = new File(System.getenv("APPDATA") + "\\.dovecot");
-    public static void main(final String[] args) throws Exception
+    public static void init() throws Exception
     {
         SAVE_DIR.mkdirs();
         final File logFile = new File(new File("logs").getAbsoluteFile(), new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date(System.currentTimeMillis())) + ".txt");
         FileUtils.createFile(logFile);
         final Logger DEFAULT_LOGGER = new Logger("Main", new PrintStream(logFile));
         LogManager.setDefault(DEFAULT_LOGGER);
-
-        final GameDirectory gameDir = new GameDirectory("Primary", ".minecraft");
-        gameDir.mkdirs();
-        final GameVersion version = gameDir.loadVersions().get(0);
-        final GameTask task = GameTask.generateNewTask(version, "java", GameTask.generateJVMArguments(version), new OfflineAccount("Dev"));
-        final Process process = task.run();
-        System.out.println(new String(process.getInputStream().readAllBytes()));
-        System.out.println(new String(process.getErrorStream().readAllBytes()));
     }
 }
