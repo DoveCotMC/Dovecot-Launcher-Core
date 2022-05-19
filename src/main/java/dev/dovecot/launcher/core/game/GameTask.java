@@ -74,6 +74,7 @@ public class GameTask
             arguments = ArrayUtils.addAll(arguments, String.format("-javaagent:%s=%s", authlibInjectorFile.getAbsoluteFile(), ((AuthlibInjectorAccount) account).getYggdrasilUrl()));
         }
         arguments = ArrayUtils.addAll(arguments, "-Djava.library.path=" + new File(version.getGameDir(), "versions\\" + version.getName() + "\\natives").getAbsolutePath());
+        arguments = ArrayUtils.addAll(arguments, "-Dlog4j2.formatMsgNoLookups=true", "-Djava.rmi.server.useCodebaseOnly=true", "-Dcom.sun.jndi.rmi.object.trustURLCodebase=false", "-Dcom.sun.jndi.cosnaming.object.trustURLCodebase=false");
         final StringBuilder classpath = new StringBuilder();
         for (final Object o : version.getJson().getJSONArray("libraries"))
         {
