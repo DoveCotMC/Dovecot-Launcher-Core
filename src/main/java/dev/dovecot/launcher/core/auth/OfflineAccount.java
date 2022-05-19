@@ -6,7 +6,7 @@ public class OfflineAccount extends AbstractAccount
 {
     public OfflineAccount(final String name)
     {
-        super(name, "\"\"", "\"\"");
+        super(name, "\"\"", "\"\"", "\"\"");
     }
 
     @Override
