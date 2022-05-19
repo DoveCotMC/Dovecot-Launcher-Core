@@ -41,6 +41,21 @@ public class AuthlibInjectorAccount extends AbstractYggdrasilAccount
     }
 
     @Override
+    public void invalidate() throws IOException
+    {
+        final HttpURLConnection connection = (HttpURLConnection) new URL(this.yggdrasilUrl.endsWith("/") ? this.yggdrasilUrl + "authserver/" + AbstractYggdrasilAccount.INVALIDATE_SUFFIX : this.yggdrasilUrl + "/authserver/" + AbstractYggdrasilAccount.INVALIDATE_SUFFIX).openConnection();
+        connection.setRequestMethod("POST");
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        connection.getOutputStream().write(new JSONObject().put("accessToken", this.accessToken).put("clientToken", this.clientToken).toString().getBytes(StandardCharsets.UTF_8));
+        if (connection.getResponseCode() >= 200 && connection.getResponseCode() < 300)
+        {
+            return;
+        }
+        throw new IOException(connection.getResponseMessage());
+    }
+
+    @Override
     public boolean isTokenAvailable() throws IOException
     {
         final HttpURLConnection connection = (HttpURLConnection) new URL(this.yggdrasilUrl.endsWith("/") ? this.yggdrasilUrl + "authserver/" + AbstractYggdrasilAccount.VALIDATE_SUFFIX : this.yggdrasilUrl + "/authserver/" + AbstractYggdrasilAccount.VALIDATE_SUFFIX).openConnection();

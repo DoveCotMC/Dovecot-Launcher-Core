@@ -15,6 +15,8 @@ public abstract class AbstractYggdrasilAccount extends AbstractAccount
         super(name, uuid, accessToken, clientToken);
     }
 
+    public abstract void invalidate() throws IOException;
+
     public abstract boolean isTokenAvailable() throws IOException;
 
     public abstract AbstractYggdrasilAccount refresh() throws IOException;

@@ -17,6 +17,11 @@ public class MojangYggdrasilAccount extends AbstractYggdrasilAccount
     }
 
     @Override
+    public void invalidate() throws IOException
+    {
+    }
+
+    @Override
     public boolean isTokenAvailable() throws IOException
     {
         return false;
