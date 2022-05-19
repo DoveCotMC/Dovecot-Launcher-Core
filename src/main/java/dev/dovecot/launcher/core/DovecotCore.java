@@ -1,19 +1,10 @@
 package dev.dovecot.launcher.core;
 
-import dev.dovecot.launcher.core.auth.AbstractAccount;
-import dev.dovecot.launcher.core.auth.AuthlibInjectorAccount;
-import dev.dovecot.launcher.core.auth.OfflineAccount;
-import dev.dovecot.launcher.core.game.GameDirectory;
-import dev.dovecot.launcher.core.game.GameTask;
-import dev.dovecot.launcher.core.game.GameVersion;
 import dev.dovecot.launcher.core.log.LogManager;
 import dev.dovecot.launcher.core.log.Logger;
 import dev.dovecot.launcher.core.utils.FileUtils;
-import dev.dovecot.launcher.core.web.UrlLoader;
-import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
